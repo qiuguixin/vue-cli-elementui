@@ -26,6 +26,7 @@ export default {
       return new Promise((resolve, reject) => {
         let user = null;
         setTimeout(() => {
+
           let hasUser = LoginUsers.some(u => {
             if (u.username === username && u.password === password) {
               user = JSON.parse(JSON.stringify(u));
@@ -67,7 +68,7 @@ export default {
         return true;
       });
       let total = mockUsers.length;
-      mockUsers = mockUsers.filter((u, index) => index < 20 * page && index >= 20 * (page - 1));
+      mockUsers = mockUsers.filter((u, index) => index < 40 * page && index >= 40 * (page - 1));
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           resolve([200, {

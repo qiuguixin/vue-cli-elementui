@@ -1,6 +1,6 @@
 <template>
 	<section>
-		<!--工具条-->
+		<!--头部工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
@@ -16,7 +16,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="users" border highlight-current-row stripe v-loading="listLoading" @selection-change="selsChange" max-height="700" style="width: 100%;">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
 			<el-table-column type="index" width="60">
@@ -31,7 +31,7 @@
 			</el-table-column>
 			<el-table-column prop="addr" label="地址" min-width="180" sortable>
 			</el-table-column>
-			<el-table-column label="操作" width="150">
+			<el-table-column label="操作" width="150" fixed="right">
 				<template scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -39,11 +39,21 @@
 			</el-table-column>
 		</el-table>
 
-		<!--工具条-->
+		<!--底部工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
-			</el-pagination>
+			<el-button type="danger"
+			@click="batchRemove"
+			:disabled="this.sels.length===0">批量删除</el-button>
+			<!-- <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			</el-pagination> -->
+			<el-pagination
+      @current-change="handleCurrentChange"
+      :page-sizes="[20, 40, 100, 200]"
+      :page-size="40"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+			style="float:right;">
+    </el-pagination>
 		</el-col>
 
 		<!--编辑界面-->
@@ -303,5 +313,16 @@
 </script>
 
 <style scoped>
-
+.demo-table-expand {
+	 font-size: 0;
+ }
+ .demo-table-expand label {
+	 width: 90px;
+	 color: #99a9bf;
+ }
+ .demo-table-expand .el-form-item {
+	 margin-right: 0;
+	 margin-bottom: 0;
+	 width: 50%;
+ }
 </style>

@@ -55,6 +55,7 @@
               this.logining = false;
               NProgress.done();
               let { msg, code, user } = data;
+              console.log(data);
               if (code !== 200) {
                 this.$notify({
                   title: '错误',
@@ -77,7 +78,7 @@
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" rel="stylesheet/scss" scoped>
   .login-container {
     /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
     -webkit-border-radius: 5px;
