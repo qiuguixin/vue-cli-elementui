@@ -1,6 +1,7 @@
 ## Vue+Webpack+ElementUI admin system
 a simple admin template based on [vuejs2](http://vuejs.org/) and [element](http://element.eleme.io/#/).
 ### 强调：必须用webstorm 必须用webstorm 必须用webstorm
+先用git命令`git clone git@github.com:qiuguixin/vue-cli-elementui.git`将示例模板下载到本地
 ### Usage
 
 This is a project template for [vue-cli](https://github.com/vuejs/vue-cli).
