@@ -1,6 +1,6 @@
 ## Vue+Webpack+ElementUI admin system
 a simple admin template based on [vuejs2](http://vuejs.org/) and [element](http://element.eleme.io/#/).
-
+### 强调：必须用webstorm 必须用webstorm 必须用webstorm
 ### Usage
 
 This is a project template for [vue-cli](https://github.com/vuejs/vue-cli).
@@ -14,6 +14,9 @@ npm run dev
 
 # build for production with minification
 npm run build
+
+# install 3 third lib
+npm install somelibs
 
 ```
 ### 特性
@@ -32,12 +35,12 @@ npm run build
 > 在`/config/index.js`中修改`dev`下`proxyTable`的值
 > 详细配置请看 [这里](https://vuejs-templates.github.io/webpack/proxy.html)
 ```
-例如：将任何请求代理到http://123.56.131.197:8080/management
-'*': {
+例如：将任何请求/management代理到http://123.56.131.197:8080/management
+'/management': {
         target: 'http://123.56.131.197:8080',
         changeOrigin: true,
         pathRewrite: {
-          '^/management': ''
+          '^/management': '/management'
         }
       }
   ```
@@ -51,8 +54,12 @@ npm run build
   <br><br>
   > 如何在新建vue文件时自动生成预设模板?<br>
    settings  -->  file and code templates .在内容区域左侧点击vue file，修改对应的`模板内容`即可。(若没有vue file,则点击`+`添加一个vue类型的模板，注意扩展名是vue)
-   <br>
-   至此，webstorm已经支持vue文件代码高亮，es6和scss、新建自动生成模板、eslint代码风格检查
+   <br><br>
+  > 如何在webstorm中热加载?<br>
+   settings  -->   Appearance and Behavir --> systerm settings .将use"safe write"(safe changes to a temporary file first)勾选掉
+   <br><br>
+
+   至此，webstorm已经支持vue文件代码高亮，es6和scss、新建自动生成模板、eslint代码风格检查、热加载
 
 4. 模板内容：
     ```
@@ -74,11 +81,15 @@ npm run build
     </style>
     ```
 5. 如何进行调试？
-> 可以安装Chrome插件 vue Devtools在chrome devtools中有一个vue选项，对vue组件进行调试。
+> 可以安装Chrome插件 [vue Devtools](https://chrome.google.com/webstore/search/vue?utm_source=chrome-ntp-icon) 在chrome devtools中有一个vue选项，对vue组件进行调试。
 
 6. 自定义模拟假数据太麻烦，怎么办？
 > 有一个包叫 [mock.js](http://mockjs.com/examples.html) ,在`/src/mockdata/`下也有对应示例
 
-7. vue语法、路由？
+7. vue语法、vue-router、vue-resource(axios)？
 > 参考 <br>
->[vue简略教程](https://github.com/keepfool/vue-tutorials)<br>[vue官网](https://cn.vuejs.org/v2/guide/) <br>[vue-router文档](http://router.vuejs.org/zh-cn/)
+>[vue简略教程(推荐先看着个)](https://github.com/keepfool/vue-tutorials)<br>
+[vue官网](https://cn.vuejs.org/v2/guide/) <br>
+[vue-router文档](http://router.vuejs.org/zh-cn/)<br>
+[vue-resource文档](https://github.com/pagekit/vue-resource)<br>
+[axios文档](https://github.com/mzabriskie/axios#handling-errors)<br>

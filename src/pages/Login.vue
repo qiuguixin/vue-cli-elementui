@@ -17,7 +17,8 @@
 
 <script>
   import { requestLogin } from '../api/api';
-  import NProgress from 'nprogress'
+  import NProgress from 'nprogress';
+
   export default {
     data() {
       return {
@@ -39,6 +40,7 @@
         checked: true
       };
     },
+
     methods: {
       handleReset2() {
         this.$refs.ruleForm2.resetFields();
@@ -50,6 +52,7 @@
             //_this.$router.replace('/table');
             this.logining = true;
             NProgress.start();
+
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
             requestLogin(loginParams).then(data => {
               this.logining = false;

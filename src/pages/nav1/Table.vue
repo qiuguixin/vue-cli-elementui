@@ -118,6 +118,7 @@
 	import util from '../../common/js/util'
 	import NProgress from 'nprogress'
 	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
+	import axios from 'axios';
 
 	export default {
 		data() {
@@ -217,6 +218,14 @@
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
 			},
+			beforeMount(){
+		        axios.get('/management/tool/getCompanyList').then( (res) => {
+		            console.log(res);
+		        }).catch(function (error) {
+		          console.log(1)
+		          console.log(error);
+		        });
+		    },
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
