@@ -25,7 +25,7 @@
         logining: false,
         ruleForm2: {
           account: 'admin',
-          checkPass: '123456'
+          checkPass: 'hzUrINet'
         },
         rules2: {
           account: [
@@ -53,21 +53,27 @@
             this.logining = true;
             NProgress.start();
 
-            var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
+            var loginParams = { userName: this.ruleForm2.account, passWord: this.ruleForm2.checkPass };
             requestLogin(loginParams).then(data => {
               this.logining = false;
               NProgress.done();
-              let { msg, code, user } = data;
+              let { info, resCode, datas } = data;
               console.log(data);
-              if (code !== 200) {
+              if (resCode !== 0) {
                 this.$notify({
                   title: '错误',
-                  message: msg,
+                  message: info,
                   type: 'error'
                 });
               } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
+                //当没有登录数据时，跳转到登录页//TODO: check reload
+                sessionStorage.setItem('user', JSON.stringify(datas));
                 this.$router.push({ path: '/table' });
+                this.$notify({
+                  title: '成功',
+                  message: '登录成功！',
+                  type: 'success'
+                });
               }
             });
           } else {

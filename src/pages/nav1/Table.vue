@@ -21,15 +21,17 @@
 			</el-table-column>
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="name" label="姓名" width="120" sortable>
+			<el-table-column prop="name" label="用户名" width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
+			<el-table-column prop="phone" label="手机" width="100" sortable>
 			</el-table-column>
-			<el-table-column prop="age" label="年龄" width="100" sortable>
+			<el-table-column prop="realName" label="真实姓名" width="100" sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="生日" width="120" sortable>
+			<el-table-column prop="role" label="角色" width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="addr" label="地址" min-width="180" sortable>
+			<el-table-column prop="email" label="邮箱" min-width="180" sortable>
+			</el-table-column>
+			<el-table-column prop="state" label="状态" min-width="180" :formatter="formatState" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150" fixed="right">
 				<template scope="scope">
@@ -117,7 +119,7 @@
 <script>
 	import util from '../../common/js/util'
 	import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
+	import { getUserList, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
 	import axios from 'axios';
 
 	export default {
@@ -129,6 +131,7 @@
 				users: [],
 				total: 0,
 				page: 1,
+				rows: 40,
 				listLoading: false,
 				sels: [],//列表选中列
 
@@ -169,8 +172,8 @@
 		},
 		methods: {
 			//性别显示转换
-			formatSex: function (row, column) {
-				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
+			formatState: function (row, column) {
+				return row.state == 1 ? '正常' : row.state == 2 ? '冻结' : '未知';
 			},
 			handleCurrentChange(val) {
 				this.page = val;
@@ -180,17 +183,28 @@
 			getUsers() {
 				let para = {
 					page: this.page,
+					rows: this.rows,
 					name: this.filters.name
 				};
 				this.listLoading = true;
 				NProgress.start();
-				getUserListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.users = res.data.users;
+				getUserList(para).then((res) => {
+					res = res.data;
+					let usersVO = res.datas.list.map((user) =>{
+						return {name: user.userName,
+						phone: user.phone,
+						realName: user.realName,
+						role: user.powerId,
+						email: user.email,
+						state: user.state
+					}});
+					this.total = res.datas.total;
+					this.users = usersVO;
 					this.listLoading = false;
 					NProgress.done();
 				});
 			},
+
 			//删除
 			handleDel: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
@@ -218,14 +232,7 @@
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
 			},
-			beforeMount(){
-		        axios.get('/management/tool/getCompanyList').then( (res) => {
-		            console.log(res);
-		        }).catch(function (error) {
-		          console.log(1)
-		          console.log(error);
-		        });
-		    },
+
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;

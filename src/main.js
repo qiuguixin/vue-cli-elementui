@@ -16,7 +16,7 @@ import Mock from './mock'
 import 'font-awesome/css/font-awesome.min.css'
 
 NProgress.configure({ showSpinner: false });
-Mock.bootstrap();
+//Mock.bootstrap();
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 

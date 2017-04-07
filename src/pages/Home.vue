@@ -72,6 +72,7 @@
 </template>
 
 <script>
+  import { LoginUsers } from '../mockdata/user';
 	export default {
 		data() {
 			return {
@@ -129,10 +130,13 @@
 			var user = sessionStorage.getItem('user');
 			if (user) {
 				user = JSON.parse(user);
-				this.sysUserName = user.name || '';
-				this.sysUserAvatar = user.avatar || '';
+				this.sysUserName = user.name || LoginUsers[0].name;
+				this.sysUserAvatar = user.avatar || LoginUsers[0].avatar;
+			}else{
+				this.sysUserName = LoginUsers[0].name;
+				this.sysUserAvatar = LoginUsers[0].avatar;
 			}
-
+			console.log(LoginUsers);
 		}
 	}
 
