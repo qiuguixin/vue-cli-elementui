@@ -21,22 +21,23 @@
 			</el-table-column>
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="name" label="用户名" width="120" sortable>
+			<el-table-column prop="name" label="用户名" min-width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="phone" label="手机" width="100" sortable>
+			<el-table-column prop="phone" label="手机" min-width="150" sortable>
 			</el-table-column>
-			<el-table-column prop="realName" label="真实姓名" width="100" sortable>
+			<el-table-column prop="realName" label="真实姓名" width="140" sortable>
 			</el-table-column>
-			<el-table-column prop="role" label="角色" width="120" sortable>
+			<el-table-column prop="roleName" label="角色" width="120" sortable>
 			</el-table-column>
 			<el-table-column prop="email" label="邮箱" min-width="180" sortable>
 			</el-table-column>
-			<el-table-column prop="state" label="状态" min-width="180" :formatter="formatState" sortable>
+			<el-table-column prop="state" label="状态" width="100" :formatter="formatState" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150" fixed="right">
 				<template scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button size="small" type="text" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+					<el-button v-if="scope.row.state == 1" type="text" size="small" @click="handleUpdateState(scope.row.id, 2)">冻结</el-button>
+					<el-button v-if="scope.row.state == 2" type="text" size="small" @click="handleUpdateState(scope.row.id, 1)">解除冻结</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -60,25 +61,23 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
+			<el-form :model="editForm" label-width="80px" ref="editForm">
+				<el-form-item label="用户名" prop="name">
+					<el-input v-model="editForm.name" :disabled="true"></el-input>
 				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
+				<el-form-item label="真实姓名" prop="realName">
+					<el-input v-model="editForm.realName" :disabled="true"></el-input>
 				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
+				<el-form-item label="角色" prop="role">
+					<el-select v-model="editForm.role" placeholder="请选择">
+			    <el-option
+			      v-for="item in roles"
+			      :label="item.label"
+			      :value="item.value">
+			    </el-option>
+			  </el-select>
 				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
-				</el-form-item>
+
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
@@ -119,8 +118,8 @@
 <script>
 	import util from '../../common/js/util'
 	import NProgress from 'nprogress'
-	import { getUserList, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
-	import axios from 'axios';
+	import { getUserList, updateUserStateToFreezeApi, updateUserStateToUnfreezeApi, batchRemoveUser, editUserApi, addUser, getRolesApi } from '../../api/api';
+
 
 	export default {
 		data() {
@@ -134,22 +133,15 @@
 				rows: 40,
 				listLoading: false,
 				sels: [],//列表选中列
-
+				roles: [],
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
-				editFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
-				},
 				//编辑界面数据
 				editForm: {
-					id: 0,
+					id: '',
 					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					realName: '',
+					role: '',
 				},
 
 				addFormVisible: false,//新增界面是否显示
@@ -162,10 +154,11 @@
 				//新增界面数据
 				addForm: {
 					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					phone: '',
+					realName: '',
+					role: '',
+					email: '',
+					state: ''
 				}
 
 			}
@@ -181,58 +174,94 @@
 			},
 			//获取用户列表
 			getUsers() {
+				this.listLoading = true;
+				NProgress.start();
+
 				let para = {
 					page: this.page,
 					rows: this.rows,
 					name: this.filters.name
 				};
-				this.listLoading = true;
-				NProgress.start();
 				getUserList(para).then((res) => {
 					res = res.data;
-					let usersVO = res.datas.list.map((user) =>{
-						return {name: user.userName,
+					this.listLoading = false;
+					NProgress.done();
+
+					if(res.resCode == 2){
+						this.$router.push({ path: '/login' });
+						return;
+					}
+					let VO = res.datas.list.map((user) =>{
+						return {
+						id: user.id,
+						name: user.userName,
 						phone: user.phone,
 						realName: user.realName,
 						role: user.powerId,
+						roleName: user.roleName,
 						email: user.email,
 						state: user.state
 					}});
 					this.total = res.datas.total;
-					this.users = usersVO;
-					this.listLoading = false;
-					NProgress.done();
+					this.users = VO;
 				});
 			},
+			getRoles(){
+				getRolesApi().then((res) => {
+					res = res.data;
+					console.log(res);
+					if(res.resCode == 2){
+						this.$router.push({ path: '/login' });
+						return;
+					}
 
-			//删除
-			handleDel: function (index, row) {
-				this.$confirm('确认删除该记录吗?', '提示', {
-					type: 'warning'
-				}).then(() => {
-					this.listLoading = true;
-					NProgress.start();
-					let para = { id: row.id };
-					removeUser(para).then((res) => {
-						this.listLoading = false;
-						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
-					});
-				}).catch(() => {
-
+					let VO = res.datas.map((role) =>{
+						return {
+						value: role.id,
+						label: role.name
+					}});
+					this.roles = VO;
 				});
+			},
+			//删除
+			handleUpdateState: function (id, state) {
+				if(state == 1){
+					updateState(id, '确认冻结吗?', updateUserStateToFreezeApi);
+				}else if(state == 2){
+					updateState(id, '确认解除冻结吗?', updateUserStateToUnfreezeApi);
+				}
+
+				function updateState(id, tipMsg, action){
+					this.$confirm(tipMsg, '提示', {
+						type: 'warning'
+					}).then(() => {
+						this.listLoading = true;
+						NProgress.start();
+
+						let para = {
+							id: id
+						 };
+						action(para).then((res) => {
+							this.listLoading = false;
+							NProgress.done();
+							this.$notify({
+								title: '成功',
+								message: '操作成功',
+								type: 'success'
+							});
+							this.getUsers();
+						});
+					}).catch(() => {
+
+					});
+				}
 			},
 			//显示编辑界面
 			handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				console.log(this.editForm);
 			},
-
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
@@ -251,16 +280,22 @@
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
 							NProgress.start();
-							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editUser(para).then((res) => {
+
+							let para = {
+								id: this.editForm.id,
+								roleId: this.editForm.role
+							};
+
+							editUserApi(para).then((res) => {
 								this.editLoading = false;
 								NProgress.done();
+
 								this.$notify({
 									title: '成功',
 									message: '提交成功',
 									type: 'success'
 								});
+
 								this.$refs['editForm'].resetFields();
 								this.editFormVisible = false;
 								this.getUsers();
@@ -323,6 +358,7 @@
 		},
 		mounted() {
 			this.getUsers();
+			this.getRoles();
 		}
 	}
 

@@ -4,7 +4,6 @@ import NotFound from './pages/404.vue'
 import Home from './pages/Home.vue'
 // main component
 import Table from './pages/nav1/Table.vue'
-import user from './pages/nav1/user.vue'
 import echarts from './pages/charts/echarts.vue'
 
 export default [
@@ -26,8 +25,7 @@ export default [
         name: '导航一',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/table', component: Table, name: 'Table' },
-            { path: '/user', component: user, name: '列表' },
+            { path: '/table', component: Table, name: 'Table' }
         ]
     },
 
